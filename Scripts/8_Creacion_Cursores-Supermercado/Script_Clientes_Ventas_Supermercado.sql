@@ -1,3 +1,6 @@
+USE bd_supermercado
+GO
+
 -- Declaración del cursor principal
 DECLARE @id_cliente INT, @nombre_cliente NVARCHAR(100);
 
