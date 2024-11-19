@@ -11,7 +11,8 @@ CREATE TABLE [adm].persona(
 	nombre NVARCHAR(100) NOT NULL,
 	apellido_paterno NVARCHAR(100) NOT NULL,
 	apellido_materno NVARCHAR(100) NOT NULL,
-	fecha_nacimiento DATE NOT NULL
+	fecha_nacimiento DATE NOT NULL,
+	flag BIT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE [ven].forma_pago(

@@ -4,269 +4,196 @@
 
 USE bd_supermercado
 GO
-CREATE PROCEDURE sp_insertar_cliente
-    @dni NVARCHAR(8),
+
+-- Procedimieto para insertar una nueva persona
+CREATE PROCEDURE sp_InsertarPersona
+    @dni VARCHAR(8),
     @nombre NVARCHAR(100),
     @apellido_paterno NVARCHAR(100),
     @apellido_materno NVARCHAR(100),
-    @id_tipo_cliente INT,
     @fecha_nacimiento DATE
 AS
 BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        -- Punto de restauración
-        SAVE TRANSACTION InsertCliente_SavePoint;
-
-        INSERT INTO [ven].cliente (dni, nombre, apellido_paterno, apellido_materno, id_tipo_cliente, fecha_nacimiento, estado)
-        VALUES (@dni, @nombre, @apellido_paterno, @apellido_materno, @id_tipo_cliente, @fecha_nacimiento, 1);
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION InsertCliente_SavePoint;
-        THROW;
-    END CATCH;
+    IF NOT EXISTS (SELECT 1 FROM [adm].persona WHERE dni = @dni)
+    BEGIN
+        INSERT INTO [adm].persona (dni, nombre, apellido_paterno, apellido_materno, fecha_nacimiento)
+        VALUES (@dni, @nombre, @apellido_paterno, @apellido_materno, @fecha_nacimiento);
+    END
+    ELSE
+    BEGIN
+        PRINT 'La persona con el DNI ingresado ya existe.';
+    END
 END;
 GO
 
-
-CREATE PROCEDURE sp_actualizar_estado_producto
-    @id_producto INT,
-    @nuevo_estado BIT
+-- Procedimieto para Actualizar los datos de una persona
+CREATE PROCEDURE sp_ActualizarPersona
+    @id INT,
+    @nombre NVARCHAR(100),
+    @apellido_paterno NVARCHAR(100),
+    @apellido_materno NVARCHAR(100),
+    @fecha_nacimiento DATE
 AS
 BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        -- Punto de restauración
-        SAVE TRANSACTION UpdateProduct_SavePoint;
-
-        UPDATE [ven].producto
-        SET estado = @nuevo_estado
-        WHERE id = @id_producto;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION UpdateProduct_SavePoint;
-        THROW;
-    END CATCH;
+    UPDATE [adm].persona
+    SET nombre = @nombre,
+        apellido_paterno = @apellido_paterno,
+        apellido_materno = @apellido_materno,
+        fecha_nacimiento = @fecha_nacimiento
+    WHERE id = @id;
 END;
 GO
 
-
-CREATE PROCEDURE sp_eliminar_sucursal
-    @id_sucursal INT
+-- Procedimieto para Eliminar una persona (soft delete)
+CREATE PROCEDURE sp_EliminarPersona
+    @id INT
 AS
 BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        -- Punto de restauración
-        SAVE TRANSACTION DeleteSucursal_SavePoint;
-
-        DELETE FROM [adm].empresa_sucursal
-        WHERE id_sucursal = @id_sucursal;
-
-        DELETE FROM [adm].sucursal
-        WHERE id = @id_sucursal;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION DeleteSucursal_SavePoint;
-        THROW;
-    END CATCH;
+    UPDATE [adm].persona
+    SET flag = 0
+    WHERE id = @id;
 END;
 GO
 
-
-CREATE FUNCTION fn_nombre_completo_cliente (@id_cliente INT)
-RETURNS NVARCHAR(300)
-AS
-BEGIN
-    DECLARE @nombre_completo NVARCHAR(300);
-
-    SELECT @nombre_completo = nombre + ' ' + apellido_paterno + ' ' + apellido_materno
-    FROM [ven].cliente
-    WHERE id = @id_cliente;
-
-    RETURN @nombre_completo;
-END;
-GO
-
-
-CREATE PROCEDURE sp_insertar_forma_pago
-    @forma NVARCHAR(50)
-AS
-BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        SAVE TRANSACTION InsertFormaPago_SavePoint;
-
-        INSERT INTO [ven].forma_pago (forma, estado)
-        VALUES (@forma, 1);
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION InsertFormaPago_SavePoint;
-        THROW;
-    END CATCH;
-END;
-GO
-
-
-CREATE PROCEDURE sp_actualizar_estado_contrato
-    @id_contrato INT,
-    @nuevo_estado BIT
-AS
-BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        SAVE TRANSACTION UpdateContrato_SavePoint;
-
-        UPDATE [adm].contrato
-        SET estado = @nuevo_estado
-        WHERE id = @id_contrato;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION UpdateContrato_SavePoint;
-        THROW;
-    END CATCH;
-END;
-GO
-
-
-CREATE PROCEDURE sp_eliminar_empleado
-    @id_empleado INT
-AS
-BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        SAVE TRANSACTION DeleteEmpleado_SavePoint;
-
-        DELETE FROM [adm].empleado
-        WHERE id = @id_empleado;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION DeleteEmpleado_SavePoint;
-        THROW;
-    END CATCH;
-END;
-GO
-
-
-CREATE FUNCTION fn_nombre_completo_empleado (@id_empleado INT)
-RETURNS NVARCHAR(300)
-AS
-BEGIN
-    DECLARE @nombre_completo NVARCHAR(300);
-
-    SELECT @nombre_completo = nombre + ' ' + apellido_paterno + ' ' + apellido_materno
-    FROM [adm].empleado
-    WHERE id = @id_empleado;
-
-    RETURN @nombre_completo;
-END;
-GO
-
-
-CREATE PROCEDURE sp_insertar_contrato
-    @fecha_inicio DATE,
-    @fecha_finalizacion DATE,
+-- Procedimieto para Insertar un producto
+CREATE PROCEDURE sp_InsertarProducto
+    @nombre VARCHAR(100),
     @descripcion NVARCHAR(255),
-    @monto DECIMAL(10,2),
+    @precio DECIMAL(10, 2),
+    @fecha_creacion DATE,
+    @fecha_vencimiento DATE = NULL,
+    @contenido_neto DECIMAL(10, 2) = NULL,
+    @existencias INT,
+    @id_tipo_producto INT,
+    @id_marca INT,
+    @id_unidad_medida INT = NULL,
+    @id_oferta INT = NULL,
+    @id_sector INT
+AS
+BEGIN
+    INSERT INTO [ven].producto 
+        (nombre, descripcion, precio, fecha_creacion, fecha_vencimiento, contenido_neto, existencias, 
+        id_tipo_producto, id_marca, id_unidad_medida, id_oferta, id_sector)
+    VALUES 
+        (@nombre, @descripcion, @precio, @fecha_creacion, @fecha_vencimiento, @contenido_neto, 
+        @existencias, @id_tipo_producto, @id_marca, @id_unidad_medida, @id_oferta, @id_sector);
+END;
+GO
+
+-- Procedimieto para Registrar una nueva venta
+CREATE PROCEDURE sp_RegistrarVenta
+    @id_cliente INT,
     @id_forma_pago INT,
-    @id_motivo_contrato INT
+    @id_estado_venta INT,
+    @fecha_cancelacion DATE,
+    @id_transaccion INT = NULL
 AS
 BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
-
-        SAVE TRANSACTION InsertContrato_SavePoint;
-
-        INSERT INTO [adm].contrato (fecha_inicio, fecha_finalizacion, descripcion, monto, id_forma_pago, id_motivo_contrato, estado)
-        VALUES (@fecha_inicio, @fecha_finalizacion, @descripcion, @monto, @id_forma_pago, @id_motivo_contrato, 1);
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION InsertContrato_SavePoint;
-        THROW;
-    END CATCH;
+    INSERT INTO [ven].venta_cabecera 
+        (id_cliente, id_forma_pago, id_estado_venta, fecha_cancelacion, id_transaccion)
+    VALUES 
+        (@id_cliente, @id_forma_pago, @id_estado_venta, @fecha_cancelacion, @id_transaccion);
 END;
 GO
 
-
-CREATE PROCEDURE sp_actualizar_estado_sucursal
-    @id_sucursal INT,
-    @nuevo_estado BIT
+-- Procedimieto para Registrar detalles de una venta
+CREATE PROCEDURE sp_RegistrarDetalleVenta
+    @id_venta_cabecera INT,
+    @fecha_venta DATE,
+    @id_producto INT
 AS
 BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
+    INSERT INTO [ven].venta_detalle (id_venta_cabecera, fecha_venta, id_producto)
+    VALUES (@id_venta_cabecera, @fecha_venta, @id_producto);
 
-        SAVE TRANSACTION UpdateSucursal_SavePoint;
-
-        UPDATE [adm].sucursal
-        SET estado = @nuevo_estado
-        WHERE id = @id_sucursal;
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION UpdateSucursal_SavePoint;
-        THROW;
-    END CATCH;
+    -- Actualizar existencias del producto
+    UPDATE [ven].producto
+    SET existencias = existencias - 1
+    WHERE id = @id_producto AND existencias > 0;
 END;
 GO
 
-
-CREATE FUNCTION fn_nombre_ciudad_sucursal (@id_sucursal INT)
-RETURNS NVARCHAR(100)
+CREATE PROCEDURE sp_ProductosBajaExistencia
+    @umbral INT
 AS
 BEGIN
-    DECLARE @nombre_ciudad NVARCHAR(100);
-
-    SELECT @nombre_ciudad = c.nombre
-    FROM [adm].sucursal s
-    INNER JOIN [adm].ciudad c ON s.id_ciudad = c.id
-    WHERE s.id = @id_sucursal;
-
-    RETURN @nombre_ciudad;
+    SELECT 
+        id, 
+        nombre, 
+        existencias 
+    FROM [ven].producto
+    WHERE existencias < @umbral;
 END;
 GO
 
-
-CREATE PROCEDURE sp_insertar_telefono
-    @prefijo NVARCHAR(3),
-    @telefono NVARCHAR(9),
-    @id_empresa_asociada INT
+CREATE PROCEDURE sp_ActualizarPrecioProducto
+    @id_producto INT,
+    @nuevo_precio DECIMAL(10, 2)
 AS
 BEGIN
-    BEGIN TRY
-        BEGIN TRANSACTION;
+    UPDATE [ven].producto
+    SET precio = @nuevo_precio
+    WHERE id = @id_producto;
+END;
+GO
 
-        SAVE TRANSACTION InsertTelefono_SavePoint;
+-- Funcion Calcular la edad de una persona
+CREATE FUNCTION fn_CalcularEdad(@fecha_nacimiento DATE)
+RETURNS INT
+AS
+BEGIN
+    RETURN DATEDIFF(YEAR, @fecha_nacimiento, GETDATE()) -
+           CASE WHEN MONTH(@fecha_nacimiento) > MONTH(GETDATE()) OR 
+                     (MONTH(@fecha_nacimiento) = MONTH(GETDATE()) AND DAY(@fecha_nacimiento) > DAY(GETDATE()))
+                THEN 1 ELSE 0 END;
+END;
+GO
 
-        INSERT INTO [adm].telefono (prefijo, telefono, id_empresa_asociada, estado)
-        VALUES (@prefijo, @telefono, @id_empresa_asociada, 1);
+-- Funcion Calcular el descuento aplicado en una venta
+CREATE FUNCTION fn_CalcularDescuento(@precio DECIMAL(10, 2), @descuento DECIMAL(5, 2))
+RETURNS DECIMAL(10, 2)
+AS
+BEGIN
+    RETURN @precio * (1 - @descuento / 100);
+END;
+GO
 
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION InsertTelefono_SavePoint;
-        THROW;
-    END CATCH;
+CREATE FUNCTION fn_ExistenciasPorSector(@id_sector INT)
+RETURNS INT
+AS
+BEGIN
+    RETURN (
+        SELECT SUM(existencias)
+        FROM [ven].producto
+        WHERE id_sector = @id_sector
+    );
+END;
+GO
+
+CREATE PROCEDURE sp_ClientesFrecuentes
+    @min_compras INT
+AS
+BEGIN
+    SELECT 
+        c.id,
+        p.nombre,
+        p.apellido_paterno,
+        COUNT(vc.id) AS compras_realizadas
+    FROM [ven].cliente c
+    INNER JOIN [ven].venta_cabecera vc ON c.id = vc.id_cliente
+	LEFT JOIN [adm].persona p ON p.id = c.id_persona
+    GROUP BY c.id, p.nombre, p.apellido_paterno
+    HAVING COUNT(vc.id) > 10;
+END;
+GO
+
+CREATE FUNCTION fn_ValorInventarioTotal()
+RETURNS DECIMAL(10, 2)
+AS
+BEGIN
+    RETURN (
+        SELECT SUM(precio * existencias)
+        FROM [ven].producto
+    );
 END;
 GO
