@@ -197,3 +197,37 @@ BEGIN
     );
 END;
 GO
+
+CREATE PROCEDURE sp_generar_backup
+    @nombre_base_datos NVARCHAR(255),
+    @ruta_backup NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        -- Validar si la base de datos existe
+        IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = @nombre_base_datos)
+        BEGIN
+            PRINT 'Error: La base de datos especificada no existe.';
+            RETURN;
+        END
+
+        -- Generar la instrucción de backup
+        DECLARE @sql NVARCHAR(MAX);
+        SET @sql = 'BACKUP DATABASE [' + @nombre_base_datos + '] ' +
+                   'TO DISK = ''' + @ruta_backup + ''' ' +
+                   'WITH FORMAT, INIT, NAME = ''Backup de ' + @nombre_base_datos + ''', SKIP, NOREWIND, NOUNLOAD, STATS = 10;';
+
+        -- Ejecutar el backup
+        EXEC sp_executesql @sql;
+
+        PRINT 'Backup completado exitosamente: ' + @ruta_backup;
+    END TRY
+    BEGIN CATCH
+        -- Manejo de errores
+        PRINT 'Error al realizar el backup.';
+        PRINT ERROR_MESSAGE();
+    END CATCH
+END;
+GO

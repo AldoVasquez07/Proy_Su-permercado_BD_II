@@ -1,145 +1,116 @@
-use bd_supermercado
-go
-
-CREATE TRIGGER trg_usuario_update
-ON [sec].usuario
-AFTER UPDATE
-AS
-BEGIN
-    DECLARE @id_usuario INT, @motivo NVARCHAR(100), @descripcion NVARCHAR(255), @fecha DATETIME;
-    
-    SET @fecha = GETDATE();
-    SET @motivo = 'Actualización de Usuario';
-    SET @descripcion = 'Se ha actualizado el registro del usuario';
-
-    SELECT @id_usuario = inserted.id 
-    FROM inserted;
-    
-    INSERT INTO [sec].log_procesos (motivo, descripcion, fecha, id_usuario)
-    VALUES (@motivo, @descripcion, @fecha, @id_usuario);
-END;
+USE bd_supermercado
 GO
 
-
-CREATE TRIGGER trg_check_stock
-ON [ven].venta_detalle
-INSTEAD OF INSERT
+-- Auditoría de cambios en 'adm.persona'
+CREATE TRIGGER trg_audit_persona
+ON [adm].persona
+AFTER INSERT, UPDATE, DELETE
 AS
 BEGIN
-    DECLARE @id_producto INT, @cantidad INT, @existencias INT;
+    SET NOCOUNT ON;
     
-    SELECT @id_producto = id_producto 
-    FROM inserted;
-    
-    SELECT @existencias = existencias 
-    FROM [ven].producto 
-    WHERE id = @id_producto;
-
-    IF (@existencias < 1)
+    IF EXISTS (SELECT * FROM inserted)
     BEGIN
-        RAISERROR ('No hay existencias suficientes para el producto', 16, 1);
-        ROLLBACK;
+        INSERT INTO [sec].log_procesos(motivo, descripcion, fecha, id_usuario)
+        VALUES (
+            'Cambio en persona',
+            'Se ha insertado o actualizado un registro en persona',
+            GETDATE(),
+            1
+        );
     END
-    ELSE
+    
+    IF EXISTS (SELECT * FROM deleted)
     BEGIN
-        -- Insertar registro en venta_detalle si hay existencias suficientes
-        INSERT INTO [ven].venta_detalle (id_venta_cabecera, fecha_venta, id_producto)
-        SELECT id_venta_cabecera, fecha_venta, id_producto 
-        FROM inserted;
-
-        -- Actualizar existencias en producto
-        UPDATE [ven].producto
-        SET existencias = existencias - 1
-        WHERE id = @id_producto;
+        INSERT INTO [sec].log_procesos(motivo, descripcion, fecha, id_usuario)
+        VALUES (
+            'Eliminación en persona',
+            'Se ha eliminado un registro de persona',
+            GETDATE(),
+            1
+        );
     END
 END;
 GO
 
 
-
-CREATE TRIGGER trg_contrato_update_status
-ON [adm].contrato
-AFTER UPDATE
-AS
-BEGIN
-    UPDATE [adm].contrato
-    SET estado = 0
-    WHERE fecha_finalizacion < GETDATE() AND estado = 1;
-END;
-GO
-
-
-CREATE TRIGGER trg_cliente_delete
-ON [ven].cliente
-AFTER DELETE
-AS
-BEGIN
-    DECLARE @id_usuario INT = 1; -- Colocar aquí el ID de un usuario del sistema, si es necesario
-    DECLARE @motivo NVARCHAR(100) = 'Eliminación de Cliente';
-    DECLARE @descripcion NVARCHAR(255) = 'Se ha eliminado un cliente';
-    DECLARE @fecha DATETIME = GETDATE();
-
-    INSERT INTO [sec].log_procesos (motivo, descripcion, fecha, id_usuario)
-    VALUES (@motivo, @descripcion, @fecha, @id_usuario);
-END;
-GO
-
-
-
-CREATE TRIGGER trg_unique_telefono
-ON [adm].telefono
-INSTEAD OF INSERT
-AS
-BEGIN
-    DECLARE @telefono NVARCHAR(9);
-
-    SELECT @telefono = telefono FROM inserted;
-
-    IF EXISTS (SELECT 1 FROM [adm].telefono WHERE telefono = @telefono)
-    BEGIN
-        RAISERROR ('El número de teléfono ya existe.', 16, 1);
-        ROLLBACK;
-    END
-    ELSE
-    BEGIN
-        INSERT INTO [adm].telefono (prefijo, telefono, id_empresa_asociada, estado)
-        SELECT prefijo, telefono, id_empresa_asociada, estado FROM inserted;
-    END
-END;
-GO
-
-CREATE TRIGGER trg_rol_update
-ON [sec].rol
-AFTER UPDATE
-AS
-BEGIN
-    DECLARE @id_usuario INT = 1; -- Colocar aquí el ID de un usuario del sistema
-    DECLARE @motivo NVARCHAR(100) = 'Actualización de Rol';
-    DECLARE @descripcion NVARCHAR(255) = 'Se ha actualizado un rol';
-    DECLARE @fecha DATETIME = GETDATE();
-
-    INSERT INTO [sec].log_procesos (motivo, descripcion, fecha, id_usuario)
-    VALUES (@motivo, @descripcion, @fecha, @id_usuario);
-END;
-GO
-
-CREATE TRIGGER trg_producto_delete_check
-ON [ven].producto
+-- Eliminación lógica en 'adm.empresa_asociada'
+CREATE TRIGGER trg_delete_empresa_asociada
+ON [adm].empresa_asociada
 INSTEAD OF DELETE
 AS
 BEGIN
-    DECLARE @id_producto INT;
-    
-    SELECT @id_producto = id FROM deleted;
-
-    IF EXISTS (SELECT 1 FROM [ven].venta_detalle WHERE id_producto = @id_producto)
-    BEGIN
-        RAISERROR ('No se puede eliminar el producto porque tiene ventas asociadas', 16, 1);
-        ROLLBACK;
-    END
-    ELSE
-    BEGIN
-        DELETE FROM [ven].producto WHERE id = @id_producto;
-    END
+    SET NOCOUNT ON;
+    UPDATE [adm].empresa_asociada
+    SET flag = 0
+    WHERE id IN (SELECT id FROM deleted);
 END;
 GO
+
+-- Eliminación lógica en 'ven.cliente'
+CREATE TRIGGER trg_delete_cliente
+ON [ven].cliente
+INSTEAD OF DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE [ven].cliente
+    SET flag = 0
+    WHERE id IN (SELECT id FROM deleted);
+END;
+GO
+
+CREATE TRIGGER trg_prevent_duplicate_inactive
+ON [ven].producto
+INSTEAD OF UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Permitir actualizaciones solo si el nuevo estado no es redundante
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN [ven].producto p ON i.id = p.id
+        WHERE p.flag = 0 AND i.flag = 0
+    )
+    BEGIN
+        RAISERROR('El producto ya está inactivo.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END
+
+    -- Ejecutar la actualización
+    UPDATE [ven].producto
+    SET flag = inserted.flag
+    FROM inserted
+    WHERE [ven].producto.id = inserted.id;
+END;
+GO
+
+CREATE TRIGGER trg_audit_empleado
+ON [adm].empleado
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO [sec].log_procesos(motivo, descripcion, fecha, id_usuario)
+    SELECT
+        'Actualización en empleado',
+        CONCAT(
+            'ID Empleado: ', d.id, 
+            '. Código (Antes): ', d.codigo, ', Código (Después): ', i.codigo,
+            '. Horas trabajo (Antes): ', d.horas_trabajo, ', Horas trabajo (Después): ', i.horas_trabajo,
+            '. Sector (Antes): ', d.id_sector, ', Sector (Después): ', i.id_sector
+        ),
+        GETDATE(),
+        1 -- Este ID de usuario debería reemplazarse con el contexto real del usuario.
+    FROM deleted d
+    INNER JOIN inserted i ON d.id = i.id
+    WHERE d.codigo <> i.codigo
+       OR d.horas_trabajo <> i.horas_trabajo
+       OR d.id_sector <> i.id_sector;
+END;
+GO
+
