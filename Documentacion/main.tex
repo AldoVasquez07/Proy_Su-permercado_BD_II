@@ -1,0 +1,139 @@
+\documentclass[12pt]{article}
+\usepackage{float}
+\usepackage[a4paper]{geometry}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{graphicx, wrapfig, subcaption, setspace, booktabs}
+\usepackage[font=small, labelfont=bf]{caption}
+\usepackage{fourier}
+\usepackage[protrusion=true, expansion=true]{microtype}
+\usepackage{apacite} % Formato APA
+\usepackage[colorlinks=true]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+\onehalfspacing
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength\headheight{15pt}
+\fancyhead[L]{Universidad de La Salle} 
+\fancyhead[R]{Sistema de Gestión de Información en Supermercados}
+\fancyfoot[R]{\thepage}
+
+\begin{document}
+
+% Portada
+\title{ \normalsize Universidad de La Salle \\
+		Facultad de Ingeniería de Software\\
+		Investigación en Modelos de Negocios para Supermercados\\ [2.0cm]
+		\HRule{} \\
+		\LARGE \textbf{Sistema de Gestión de Información en Supermercados} %para que quede encerrado en las líneas
+		\HRule{} \\ [0.5cm]
+		\normalsize \today \vspace*{5\baselineskip}}
+
+\date{}
+
+\author{
+		María Fernanda Adira Pinazo Vera, Aldo Ray Vasquez Lopez \\ 
+		mpinazov@ulasalle.edu.pe, avasquezl@ulasalle.edu.pe
+   }
+\maketitle
+
+\clearpage  % Para evitar problemas de página con el índice
+
+% Índice
+\tableofcontents
+\newpage
+
+% Cuerpo del Documento
+\section{Introducción}
+
+\subsection{Contexto y Justificación}
+El modelo de negocio en supermercados ha evolucionado con el uso intensivo de datos para mejorar la toma de decisiones y optimizar operaciones clave. En los últimos años, se han observado pérdidas en ventas y una disminución en la satisfacción del cliente, derivadas de una gestión deficiente de la información y la falta de precisión en el manejo de la gestión de ventas. Este estudio aborda la implementación de un sistema de gestión de datos que utilice una arquitectura de base de datos en SQL Server, con la intención de centralizar la información de forma segura y eficiente.
+
+\subsection{Objetivo General}
+Implementar una solución de base de datos para mejorar la calidad de la información en supermercados, garantizando un flujo preciso de datos y optimizando la toma de decisiones.
+
+\subsection{Objetivos Específicos} 
+\begin{itemize}
+    \item Identificar los problemas actuales en la gestión de información en supermercados, específicamente en la precisión y disponibilidad de datos relacionados con las ventas.
+    \item Diseñar y desarrollar un modelo de base de datos en SQL Server que centralice la información relevante de ventas, clientes y contratos para un mejor control y accesibilidad.
+    \item Integrar funciones de auditoría y seguridad en la base de datos para asegurar la integridad y confidencialidad de los datos.
+    \item Evaluar el rendimiento del sistema propuesto mediante la simulación de big data, empleando herramientas de generación de datos sintéticos como la librería Faker de Python.
+    \item Analizar el impacto de la nueva estructura de datos en la eficiencia operativa del supermercado y en la satisfacción del cliente.
+\end{itemize}
+
+\subsection{Preguntas de Investigación}
+\begin{itemize}
+    \item ¿Cómo puede una base de datos estructurada optimizar la eficiencia operativa en un entorno de supermercado?
+    \item ¿Qué impacto tiene la precisión en el manejo de datos sobre las ventas y la satisfacción del cliente en el contexto minorista?
+    \item ¿Qué estrategias de normalización y seguridad en SQL Server son recomendables para evitar pérdidas de datos y asegurar su integridad?
+\end{itemize}
+
+\section{Marco Teórico}
+
+\subsection{Modelo de Negocio en Supermercados}
+Los supermercados operan en un entorno altamente competitivo, donde la disponibilidad, precisión y seguridad de la información son fundamentales. Este modelo de negocio depende en gran medida de la gestión de ventas, clientes y proveedores, lo que implica la necesidad de un sistema de información robusto que permita controlar y evaluar cada proceso en tiempo real.
+
+\subsection{Estructura y Normalización de la Base de Datos}
+Para la implementación de este proyecto, se diseñará una base de datos normalizada que asegure la consistencia y la integridad de los datos. El modelo incluirá relaciones entre las principales entidades comerciales: ventas, clientes, empleados y contratos. Esto evitará redundancia, asegurará eficiencia en el almacenamiento de datos y permitirá una rápida generación de informes.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|p{10cm}|}
+        \hline
+        \textbf{Forma Normal} & \textbf{Tablas} \\ \hline
+        1NF & 
+        adm.persona, ven.forma\_pago, adm.telefono, adm.ciudad, adm.tipo\_empleado, ven.tipo\_producto, 
+        ven.estado\_venta, sec.usuario. \\ \hline
+        2NF & 
+        adm.contrato, adm.empresa\_asociada, adm.empresa\_sucursal, adm.empleado, ven.cliente, 
+        ven.producto, ven.transaccion, ven.venta\_detalle, sec.rol. \\ \hline
+        3NF & 
+        adm.motivo\_contrato, adm.sucursal, adm.tipo\_sector, adm.sector, ven.marca\_producto, 
+        ven.unidad\_medida, ven.banco, sec.log\_procesos. \\ \hline
+    \end{tabular}
+    \caption{Tablas clasificadas según su forma normal.}
+    \label{tab:formas-normales}
+\end{table}
+
+
+\subsection{Seguridad y Auditoría en SQL Server}
+El uso de SQL Server permitirá implementar políticas de seguridad estrictas, de modo que los datos sensibles estén protegidos contra accesos no autorizados. Además, se desarrollarán triggers y procedimientos almacenados para auditorías internas, garantizando que cada cambio en los datos sea registrado y pueda ser auditado en caso necesario.
+
+\section{Metodología}
+
+\subsection{Diseño de la Base de Datos}
+Se propone un diseño relacional en SQL Server, siguiendo el enfoque de investigación en arquitectura de bases de datos para optimizar la consulta y procesamiento de datos. Se generarán datos ficticios utilizando la librería \texttt{Faker} en Python para simular transacciones reales y analizar patrones en los datos de ventas y clientes.
+
+\subsection{Simulación de Big Data}
+Para explorar el comportamiento del sistema bajo un volumen elevado de datos, se generarán datos de ejemplo (big data) mediante la librería Faker en Python. Estos datos permitirán evaluar la respuesta del sistema en términos de rendimiento, escalabilidad y seguridad. Los resultados se presentarán en términos de estadísticas y gráficos que demuestren la eficacia de la arquitectura propuesta.
+
+\section{Resultados Esperados}
+
+\subsection{Impacto en el Modelo de Negocio}
+Se espera que la implementación de esta base de datos permita una mejora en la eficiencia operativa del supermercado. Entre los beneficios esperados están: reducción de errores en la gestión de ventas, mejor administración de contratos, y una mejora en la satisfacción del cliente mediante una experiencia de compra más eficiente.
+
+\subsection{Limitaciones}
+El modelo no contempla pagos a plazos, por lo que los clientes deberán realizar sus pagos de forma inmediata. Además, se restringe la eliminación de datos críticos para asegurar la trazabilidad y consistencia histórica en la base de datos.
+
+\section{Conclusiones y Recomendaciones}
+
+\subsection{Conclusiones}
+El diseño de una base de datos normalizada y su implementación en SQL Server puede ofrecer mejoras significativas en el manejo de datos de supermercados, permitiendo una gestión integral de las ventas, clientes y contratos. Este proyecto ofrece un enfoque estructurado que asegura la integridad y la accesibilidad de la información, aspectos claves para el éxito de este modelo de negocio.
+
+\subsection{Recomendaciones}
+Para futuras implementaciones, se sugiere una integración de herramientas de análisis de datos que permitan identificar patrones de compra y preferencias de clientes, con el fin de adaptar la oferta a las necesidades reales del consumidor y mejorar la competitividad en el mercado.
+
+
+\end{document}
+
