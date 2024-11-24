@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formas de Pago</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_table.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h2 style="text-align: center;">Lista de Formas de Pago</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Forma</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for forma in forma_pago %}
+            <tr>
+                <td>{{ forma.id }}</td>
+                <td>{{ forma.forma }}</td>
+                <td>{{ forma.estado }}</td>
+                <td class="actions">
+                    <form action="{{ url_for('forma_pago.editar_forma_pago', id=forma.id) }}" method="get" style="display: inline;">
+                        <button type="submit" title="Editar" style="background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </form>
+                    <form action="{{ url_for('forma_pago.eliminar_forma_pago', id=forma.id) }}" method="post" style="display: inline;">
+                        <button type="submit" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este contrato?');" style="background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">No hay formas de pago disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        <a href="{{ url_for('forma_pago.listar_forma_pago', page=1) }}" {% if page == 1 %}class="disabled"{% endif %}>|&lt;</a>
+        <a href="{{ url_for('forma_pago.listar_forma_pago', page=page-1) }}" {% if page == 1 %}class="disabled"{% endif %}>&lt;</a>
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        <a href="{{ url_for('forma_pago.listar_forma_pago', page=page+1) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;</a>
+        <a href="{{ url_for('forma_pago.listar_forma_pago', page=total_pages) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;|</a>
+    </div>
+</body>
+</html>

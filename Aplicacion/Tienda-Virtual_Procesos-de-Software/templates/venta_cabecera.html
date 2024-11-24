@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_table.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h2 style="text-align: center;">Lista de Ventas</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Fecha</th>
+                <th>Fecha Cancelacion</th>
+                <th>Tarjeta</th>
+                <th>Banco</th>
+                <th>Estado</th>
+                <th>Cliente</th>
+                <th>Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.id }}</td>
+                <td>{{ venta.fecha }}</td>
+                <td>{{ venta.fecha_cancelacion }}</td>
+                <td>{{ venta.tarjeta }}</td>
+                <td>{{ venta.banco }}</td>
+                <td>{{ venta.estado }}</td>
+                <td>{{ venta.cliente }}</td>
+                <td><a href="{{ url_for('venta_detalle.listar_detalle_venta', id_venta_cabecera=venta.id) }}"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">No hay formas de pago disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        <a href="{{ url_for('ventas.listar_ventas', page=1) }}" {% if page == 1 %}class="disabled"{% endif %}>|&lt;</a>
+        <a href="{{ url_for('ventas.listar_ventas', page=page-1) }}" {% if page == 1 %}class="disabled"{% endif %}>&lt;</a>
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        <a href="{{ url_for('ventas.listar_ventas', page=page+1) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;</a>
+        <a href="{{ url_for('ventas.listar_ventas', page=total_pages) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;|</a>
+    </div>
+
+</body>
+</html>

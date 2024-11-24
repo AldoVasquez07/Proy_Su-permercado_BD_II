@@ -1,0 +1,57 @@
+# Entornos virtuales
+venv/
+.env/
+*.env
+
+# Archivos de configuración de Flask
+instance/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Archivos de bases de datos locales
+*.sqlite3
+*.db
+
+# Archivos de registro
+*.log
+
+# Archivos y carpetas generados por el sistema
+*.swp
+*.swo
+*.~undo-tree
+*.bak
+.DS_Store
+Thumbs.db
+
+# Archivos y carpetas de dependencias instaladas
+*.egg-info/
+pip-log.txt
+dist/
+build/
+
+# Migraciones de Flask-Migrate
+migrations/
+
+# Archivos estáticos y subidos
+staticfiles/
+media/
+uploads/
+
+# Configuraciones de PyCharm / IntelliJ IDEA
+.idea/
+
+# Configuraciones de Visual Studio Code
+.vscode/
+
+# Archivos de prueba y cobertura
+htmlcov/
+pytest_cache/
+.tox/
+
+# Otros posibles entornos o configuraciones específicas
+.ipynb_checkpoints/  # Para proyectos que incluyan notebooks Jupyter
+*.coverage
+.coverage.*
+.cache/

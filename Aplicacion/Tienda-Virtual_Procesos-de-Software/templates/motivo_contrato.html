@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motivo de Contratos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_table.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h2 style="text-align: center;">Lista de Motivos de Contrato</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Motivo</th>
+                <th>Contrato</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for motivo_con in motivo_contrato %}
+            <tr>
+                <td>{{ motivo_con.id }}</td>
+                <td>{{ motivo_con.motivo }}</td>
+                <td>{{ motivo_con.estado }}</td>
+                <td class="actions">
+                    <form action="{{ url_for('motivo_contrato.editar_motivo_contrato', id=motivo_con.id) }}" method="get" style="display: inline;">
+                        <button type="submit" title="Editar" style="background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </form>
+                    <form action="{{ url_for('motivo_contrato.eliminar_motivo_contrato', id=motivo_con.id) }}" method="post" style="display: inline;">
+                        <button type="submit" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este contrato?');" style="background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">No hay motivos disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        <a href="{{ url_for('motivo_contrato.listar_motivo_contrato', page=1) }}" {% if page == 1 %}class="disabled"{% endif %}>|&lt;</a>
+        <a href="{{ url_for('motivo_contrato.listar_motivo_contrato', page=page-1) }}" {% if page == 1 %}class="disabled"{% endif %}>&lt;</a>
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        <a href="{{ url_for('motivo_contrato.listar_motivo_contrato', page=page+1) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;</a>
+        <a href="{{ url_for('motivo_contrato.listar_motivo_contrato', page=total_pages) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;|</a>
+    </div>
+</body>
+</html>

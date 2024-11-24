@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motivo de Contratos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_table.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h2 style="text-align: center;">Lista de Motivos de Contrato</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>DNI</th>
+                <th>Codigo</th>
+                <th>Nombre</th>
+                <th>Horas Trabajadas</th>
+                <th>Tipo</th>
+                <th>Supervisor</th>
+                <th>Contrato</th>
+                <th>Sector</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in empleados %}
+            <tr>
+                <td>{{ emp.id }}</td>
+                <td>{{ emp.dni }}</td>
+                <td>{{ emp.codigo }}</td>
+                <td>{{ emp.nombre_completo }}</td>
+                <td>{{ emp.horas_trabajo }}</td>
+                <td>{{ emp.tipo }}</td>
+                <td>{{ emp.supervisor }}</td>
+                <td>{{ emp.descripcion_contrato }}</td>
+                <td>{{ emp.sector }}</td>
+                <td class="actions">
+                    <form action="{{ url_for('empleado.editar_empleado', id=emp.id) }}" method="get" style="display: inline;">
+                        <button type="submit" title="Editar" style="background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </form>
+                    <form action="{{ url_for('empleado.eliminar_empleado', id=emp.id) }}" method="post" style="display: inline;">
+                        <button type="submit" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este contrato?');" style="background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">No hay motivos disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        <a href="{{ url_for('empleado.listar_empleado', page=1) }}" {% if page == 1 %}class="disabled"{% endif %}>|&lt;</a>
+        <a href="{{ url_for('empleado.listar_empleado', page=page-1) }}" {% if page == 1 %}class="disabled"{% endif %}>&lt;</a>
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        <a href="{{ url_for('empleado.listar_empleado', page=page+1) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;</a>
+        <a href="{{ url_for('empleado.listar_empleado', page=total_pages) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;|</a>
+    </div>
+</body>
+</html>

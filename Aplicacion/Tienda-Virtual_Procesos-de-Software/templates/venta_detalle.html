@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Venta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_table.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_bottom.css') }}">
+</head>
+<body>
+    <h2 style="text-align: center;">Lista de Productos Comprados</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr>
+                <td>{{ venta.nombre }}</td>
+                <td>{{ venta.descripcion }}</td>
+                <td>{{ venta.precio }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No hay productos registrados en esta venta.</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2" style="text-align: right; font-weight: bold;">Total:</td>
+                <td>{{ total }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('ventas.listar_ventas') }}" class="btn-volver">Volver</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+ body {
+     font-family: Arial, sans-serif;
+     background-color: #f4f6f9;
+     color: #333;
+     margin: 0;
+     padding: 0;
+ }
+ h2 {
+     text-align: center;
+     color: #00022c;
+     margin-top: 30px;
+ }
+ table {
+     width: 80%;
+     margin: 20px auto;
+     border-collapse: collapse;
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+     border-radius: 8px;
+     overflow: hidden;
+ }
+ th, td {
+     padding: 12px 15px;
+     text-align: center;
+     border-bottom: 1px solid #ddd;
+ }
+ th {
+     background-color: #14154d;
+     color: #fff;
+     font-weight: bold;
+ }
+ tr:nth-child(even) {
+     background-color: #f9f9f9;
+ }
+ tr:hover {
+     background-color: #f1f5fa;
+ }
+ .actions {
+     display: flex;
+     justify-content: center;
+     gap: 10px;
+ }
+ .actions button {
+     border: none;
+     background: none;
+     cursor: pointer;
+     color: #007bff;
+     font-size: 16px;
+ }
+ .actions button:hover {
+     color: #14154d;
+ }
+ .pagination {
+     text-align: center;
+     margin: 20px 0;
+ }
+ .pagination a {
+     color: #007bff;
+     text-decoration: none;
+     border: 1px solid #ddd;
+     padding: 8px 12px;
+     margin: 0 4px;
+     border-radius: 4px;
+     font-size: 14px;
+ }
+ .pagination a:hover {
+     background-color: #007bff;
+     color: white;
+ }
+ .pagination .disabled {
+     pointer-events: none;
+     color: #aaa;
+     border-color: #ddd;
+ }
+ .pagination span {
+     font-size: 14px;
+     margin: 0 10px;
+     color: #333;
+ }
+ @media (max-width: 768px) {
+     table {
+         width: 100%;
+     }
+     th, td {
+         padding: 10px;
+     }
+ }

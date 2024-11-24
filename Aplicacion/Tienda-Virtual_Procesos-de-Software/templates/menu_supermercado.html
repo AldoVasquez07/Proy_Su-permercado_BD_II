@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Desplegable</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_menu.css') }}">
+</head>
+<body>
+    <!--<div class="sidebar">
+        <button class="menu-btn">☰ Menú</button>
+        <ul class="menu-list">
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/forma_pago">Forma de Pago</a></li>
+            <li><a href="/motivo_contrato">Motivo Contrato</a></li>
+            <li><a href="/contrato">Contrato</a></li>
+            <li><a href="/venta_cabecera">Venta Cabecera</a></li>
+            <li><a href="/venta_detalle">Venta Detalle</a></li>
+        </ul>
+    </div>-->
+    <h1>Ventas e Ingresos por Fecha</h1>
+    <img src="data:image/png;base64,{{ ventas_graph_url }}" alt="Gráfico de Ventas e Ingresos">
+    <img src="data:image/png;base64,{{ empleados_graph_url }}" alt="Gráfico de Ventas e Ingresos">
+    <img src="data:image/png;base64,{{ empresas_graph_url }}" alt="Gráfico de Ventas e Ingresos">
+    <div class="content">
+        <h1>Bienvenido</h1>
+        <p>Seleccione una opción del menú lateral.</p>
+    </div>
+    <script src="{{ url_for('static', filename='animation_menu.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design_table.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <h2 style="text-align: center;">Usuarios</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>N°</th>
+                <th>Codigo</th>
+                <th>Dni</th>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in usuarios %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.codigo }}</td>
+                <td>{{ user.dni }}</td>
+                <td>{{ user.usuario }}</td>
+                <td>{{ user.correo }}</td>
+                <td>{{ user.flag }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">No hay formas de pago disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        <a href="{{ url_for('ventas.listar_ventas', page=1) }}" {% if page == 1 %}class="disabled"{% endif %}>|&lt;</a>
+        <a href="{{ url_for('ventas.listar_ventas', page=page-1) }}" {% if page == 1 %}class="disabled"{% endif %}>&lt;</a>
+
+        <span>Página {{ page }} de {{ total_pages }}</span>
+
+        <a href="{{ url_for('ventas.listar_ventas', page=page+1) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;</a>
+        <a href="{{ url_for('ventas.listar_ventas', page=total_pages) }}" {% if page == total_pages %}class="disabled"{% endif %}>&gt;|</a>
+    </div>
+
+</body>
+</html>
