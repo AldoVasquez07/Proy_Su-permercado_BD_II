@@ -11,6 +11,7 @@ from controller.forma_pago_controller import forma_pago_bp
 from controller.motivo_contrato_controller import motivo_contrato_bp
 from controller.usuario_controller import usuario_bp
 from controller.venta_cabecera_controller import venta_cabecera_bp
+from controller.venta_detalle_controller import venta_detalle_bp
 
 
 app = Flask(__name__)
@@ -20,6 +21,8 @@ app.register_blueprint(forma_pago_bp)
 app.register_blueprint(motivo_contrato_bp)
 app.register_blueprint(usuario_bp)
 app.register_blueprint(venta_cabecera_bp)
+app.register_blueprint(venta_detalle_bp)
+
 
 
 @app.route('/')

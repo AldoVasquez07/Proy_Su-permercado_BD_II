@@ -11,4 +11,4 @@ def listar_ventas():
     page = request.args.get('page', 1, type=int)
     ventas = listar_ventas_service()
     pagina, page, total_pages = generar_variables_paginacion(page, 15, ventas)
-    return render_template('venta_cabecera.html', usuarios=pagina, page=page, total_pages=total_pages)
+    return render_template('venta_cabecera.html', ventas=pagina, page=page, total_pages=total_pages)
