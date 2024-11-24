@@ -5,4 +5,4 @@ class UsuarioEntity:
         self.dni = dni
         self.usuario = usuario
         self.correo = correo
-        self.flag = flag
+        self.flag = 'Activo' if flag else 'Inactivo'

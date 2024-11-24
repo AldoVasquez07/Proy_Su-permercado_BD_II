@@ -208,3 +208,62 @@ SELECT
 FROM 
     [adm].empresa_asociada ea;
 GO
+
+CREATE VIEW vw_empleados AS
+SELECT
+	EMP.id,
+	PER.dni,
+	EMP.codigo,
+	PER.nombre + ' ' + PER.apellido_paterno + ' ' + PER.apellido_materno AS nombre_completo,
+	EMP.horas_trabajo,
+	TEMP.tipo,
+	PER_SUP.nombre + ' ' + PER_SUP.apellido_paterno + ' ' + PER_SUP.apellido_materno AS supervisor,
+	CON.descripcion AS descripcion_contrato,
+	SEC.nombre AS sector
+FROM adm.empleado AS EMP
+LEFT JOIN adm.persona AS PER
+ON PER.id = EMP.id_persona
+LEFT JOIN adm.tipo_empleado AS TEMP
+ON TEMP.id = EMP.id_tipo_empleado
+LEFT JOIN adm.empleado AS SUP
+ON SUP.id = EMP.id_supervisor
+LEFT JOIN adm.persona AS PER_SUP
+ON PER_SUP.id = SUP.id_persona
+LEFT JOIN adm.contrato AS CON
+ON CON.id = EMP.id_contrato
+LEFT JOIN adm.sector AS SEC
+ON SEC.id = EMP.id_sector
+GO
+
+CREATE VIEW vw_usuario AS
+SELECT
+	u.id,
+	u.codigo,
+	p.dni,
+	p.nombre + ' ' + p.apellido_paterno + ' ' + p.apellido_materno AS usuario,
+	u.correo,
+	u.flag
+FROM sec.usuario as u
+LEFT JOIN adm.persona as p
+ON p.id = u.id_persona
+go
+
+create view vw_ventas_cabecera as
+select
+	vc.id,
+	vc.fecha,
+	vc.fecha_cancelacion,
+	t.tarjeta,
+	b.nombre as banco,
+	vc.flag,
+	p.nombre + ' ' + p.apellido_paterno + ' ' + p.apellido_materno as cliente
+from ven.venta_cabecera as vc
+left join ven.transaccion as t
+on t.id = vc.id_transaccion
+left join ven.banco as b
+on b.id = t.id_banco
+left join ven.cliente as c
+on c.id = vc.id_cliente
+left join adm.persona as p
+on p.id = c.id_persona
+go

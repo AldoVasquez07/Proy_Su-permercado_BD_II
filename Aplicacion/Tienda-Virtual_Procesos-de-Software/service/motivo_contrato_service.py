@@ -12,7 +12,7 @@ def listar_motivo_contrato_service():
         motivos = MotivoContratoEntity(
             id=fila.id,
             motivo=fila.motivo,
-            estado=fila.estado
+            flag=fila.flag
         )
         motivo_contratos.append(motivos)
 

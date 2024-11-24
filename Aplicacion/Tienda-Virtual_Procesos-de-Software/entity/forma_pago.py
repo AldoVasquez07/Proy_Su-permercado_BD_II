@@ -1,5 +1,5 @@
 class FormaPagoEntidad:
-    def __init__(self, id, forma, estado):
+    def __init__(self, id, forma, flag):
         self.id = id
         self.forma = forma
-        self.estado = estado
+        self.flag = flag

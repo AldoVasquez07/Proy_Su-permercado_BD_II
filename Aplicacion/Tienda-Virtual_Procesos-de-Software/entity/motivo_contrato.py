@@ -1,5 +1,5 @@
 class MotivoContratoEntity:
-    def __init__(self, id, motivo, estado):
+    def __init__(self, id, motivo, flag):
         self.id = id
         self.motivo = motivo
-        self.estado = estado
+        self.flag = 'Activo' if flag else 'Inactivo'

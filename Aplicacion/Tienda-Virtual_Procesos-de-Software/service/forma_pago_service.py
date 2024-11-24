@@ -12,7 +12,7 @@ def listar_forma_pago_service():
         forma_pago = FormaPagoEntidad(
             id=fila.id,
             forma=fila.forma,
-            estado=fila.estado
+            flag=fila.flag
         )
         formas_pago.append(forma_pago)
 

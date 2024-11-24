@@ -17,7 +17,7 @@ def listar_contrato_service():
             monto=fila.monto,
             id_forma_pago=fila.forma,
             id_motivo_contrato=fila.motivo,
-            estado=fila.estado
+            flag=fila.flag
         )
         contratos.append(contrato)
 

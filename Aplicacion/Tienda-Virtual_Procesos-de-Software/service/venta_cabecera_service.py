@@ -15,7 +15,7 @@ def listar_ventas_service():
             fecha_cancelacion=fila.fecha_cancelacion,
             tarjeta=fila.tarjeta,
             banco=fila.banco,
-            estado=fila.estado,
+            flag=fila.flag,
             cliente=fila.cliente
         )
         venta_cabecera.append(venta)

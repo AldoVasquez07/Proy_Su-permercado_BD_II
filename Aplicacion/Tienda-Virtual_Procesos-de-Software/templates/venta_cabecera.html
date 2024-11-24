@@ -31,7 +31,7 @@
                 <td>{{ venta.fecha_cancelacion }}</td>
                 <td>{{ venta.tarjeta }}</td>
                 <td>{{ venta.banco }}</td>
-                <td>{{ venta.estado }}</td>
+                <td>{{ venta.flag }}</td>
                 <td>{{ venta.cliente }}</td>
                 <td><a href="{{ url_for('venta_detalle.listar_detalle_venta', id_venta_cabecera=venta.id) }}"><i class="fas fa-eye"></i></a></td>
             </tr>

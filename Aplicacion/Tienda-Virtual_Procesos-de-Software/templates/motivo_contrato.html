@@ -15,7 +15,7 @@
             <tr>
                 <th>N°</th>
                 <th>Motivo</th>
-                <th>Contrato</th>
+                <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -24,7 +24,7 @@
             <tr>
                 <td>{{ motivo_con.id }}</td>
                 <td>{{ motivo_con.motivo }}</td>
-                <td>{{ motivo_con.estado }}</td>
+                <td>{{ motivo_con.flag }}</td>
                 <td class="actions">
                     <form action="{{ url_for('motivo_contrato.editar_motivo_contrato', id=motivo_con.id) }}" method="get" style="display: inline;">
                         <button type="submit" title="Editar" style="background: none; border: none; cursor: pointer;">

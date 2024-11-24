@@ -34,7 +34,7 @@
                 <td>{{ con.monto }}</td>
                 <td>{{ con.forma_pago }}</td>
                 <td>{{ con.motivo_contrato }}</td>
-                <td>{{ con.estado }}</td>
+                <td>{{ con.flag }}</td>
                 <td class="actions">
                     <form action="{{ url_for('contrato.editar_contrato', id=con.id) }}" method="get" style="display: inline;">
                         <button type="submit" title="Editar" style="background: none; border: none; cursor: pointer;">
